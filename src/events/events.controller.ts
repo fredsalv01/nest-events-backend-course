@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Logger,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -43,6 +44,10 @@ export class EventsController {
         id: id,
       },
     });
+    if (!event) {
+      throw new NotFoundException('No se encontro el evento');
+    }
+
     return event;
   }
 
