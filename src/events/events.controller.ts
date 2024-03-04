@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -23,6 +24,9 @@ import { Length } from 'class-validator';
 import { Attendee } from './attendee.entity';
 import { EventsService } from './events.service';
 import { ListEvents } from './dtos/list.events';
+import { CurrentUser } from '../auth/current-user.decorator';
+import { User } from '../auth/user.entity';
+import { AuthGuardJwt } from "../auth/auth-guard-jwt";
 
 @Controller({
   path: '/events',
@@ -49,7 +53,7 @@ export class EventsController {
         {
           total: true,
           currentPage: Number(filter.page),
-          limit: Number(filter.limit)
+          limit: Number(filter.limit),
         },
       );
     return events;
@@ -96,13 +100,9 @@ export class EventsController {
   }
 
   @Post()
-  create(@Body() input: CreateEventDto) {
-    const event = {
-      ...input,
-      when: new Date(input.when),
-    } as Event;
-
-    return this.eventRepository.save(event);
+  @UseGuards(AuthGuardJwt)
+  async create(@Body() input: CreateEventDto, @CurrentUser() user: User) {
+    return await this.eventsService.createEvent(input, user);
   }
 
   @Patch(':id')
@@ -130,7 +130,7 @@ export class EventsController {
   @HttpCode(204)
   async remove(@Param('id', new ParseIntPipe()) id: number) {
     const result = await this.eventsService.deleteEvent(id);
-    if(result?.affected !== 1){
+    if (result?.affected !== 1) {
       throw new NotFoundException();
     }
   }
