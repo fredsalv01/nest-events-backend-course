@@ -18,11 +18,7 @@ import {
 } from '@nestjs/common';
 import { CreateEventDto } from './dtos/create-event.dto';
 import { UpdateEventDto } from './dtos/update-event.dto';
-import { Event } from './event.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Length } from 'class-validator';
-import { Attendee } from './attendee.entity';
 import { EventsService } from './events.service';
 import { ListEvents } from './dtos/list.events';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -36,10 +32,6 @@ export class EventsController {
   private readonly logger = new Logger(EventsController.name);
 
   constructor(
-    @InjectRepository(Event)
-    private readonly eventRepository: Repository<Event>,
-    @InjectRepository(Attendee)
-    private readonly attendeeRepository: Repository<Attendee>,
     private readonly eventsService: EventsService,
   ) {}
 
@@ -138,11 +130,7 @@ export class EventsController {
     @Param('id', new ParseIntPipe()) id: number,
     @CurrentUser() user: User,
   ) {
-    const event = await this.eventRepository.findOne({
-      where: {
-        id: id,
-      },
-    });
+    const event = await this.eventsService.getEvent(id);
 
     if(!event){
       throw new NotFoundException();
