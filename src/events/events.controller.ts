@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   ForbiddenException,
@@ -12,7 +13,9 @@ import {
   Patch,
   Post,
   Query,
+  SerializeOptions,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -28,12 +31,11 @@ import { AuthGuardJwt } from '../auth/auth-guard-jwt';
 @Controller({
   path: '/events',
 })
+@SerializeOptions({ strategy: 'excludeAll' })
 export class EventsController {
   private readonly logger = new Logger(EventsController.name);
 
-  constructor(
-    private readonly eventsService: EventsService,
-  ) {}
+  constructor(private readonly eventsService: EventsService) {}
 
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -83,6 +85,7 @@ export class EventsController {
   // }
 
   @Get(':id')
+  @UseInterceptors(ClassSerializerInterceptor)
   async findOne(@Param('id', new ParseIntPipe()) id: number) {
     const event = await this.eventsService.getEvent(id);
     if (!event) {
@@ -97,7 +100,6 @@ export class EventsController {
   async create(@Body() input: CreateEventDto, @CurrentUser() user: User) {
     return await this.eventsService.createEvent(input, user);
   }
-  
 
   @Patch(':id')
   @UseGuards(AuthGuardJwt)
@@ -109,7 +111,7 @@ export class EventsController {
   ) {
     const event = await this.eventsService.getEvent(id);
 
-    if(!event){
+    if (!event) {
       throw new NotFoundException();
     }
 
@@ -132,7 +134,7 @@ export class EventsController {
   ) {
     const event = await this.eventsService.getEvent(id);
 
-    if(!event){
+    if (!event) {
       throw new NotFoundException();
     }
 

@@ -4,6 +4,7 @@ import {
   Controller,
   HttpCode,
   Post,
+  SerializeOptions,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create.user.dto';
 import { User } from './user.entity';
@@ -12,6 +13,7 @@ import { Repository } from 'typeorm';
 import { hashPasswordFunction } from './utils/functions';
 
 @Controller('users')
+@SerializeOptions({ strategy: 'excludeAll' })
 export class UsersController {
   constructor(
     @InjectRepository(User)
