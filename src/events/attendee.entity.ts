@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Event } from './event.entity';
 import { Expose } from 'class-transformer';
+import { User } from '../auth/user.entity';
 
 export enum AttendeeAnswerEnum {
   Accepted = 1,
@@ -30,10 +31,19 @@ export class Attendee {
   @JoinColumn()
   event: Event;
 
+  @Column()
+  eventId: number;
+
   @Column('enum', {
     enum: AttendeeAnswerEnum,
     default: AttendeeAnswerEnum.Accepted,
   })
   @Expose()
   answer: AttendeeAnswerEnum;
+
+  @ManyToOne(() => User, (user) => user.attended)
+  user: User;
+
+  @Column()
+  userId: number;
 }
