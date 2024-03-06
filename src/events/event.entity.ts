@@ -33,16 +33,9 @@ export class Event {
   @Expose()
   address: string;
 
-  @OneToMany(
-    () => Attendee,
-    (attendee) => attendee.event,
-    {
-      cascade: true,
-    },
-    // {
-    //   eager: true
-    // }
-  )
+  @OneToMany(() => Attendee, (attendee) => attendee.event, {
+    cascade: true
+  })
   @Expose()
   attendees: Attendee[];
 

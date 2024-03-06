@@ -26,7 +26,7 @@ import { EventsService } from './events.service';
 import { ListEvents } from './dtos/list.events';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { User } from '../auth/user.entity';
-import { AuthGuardJwt } from '../auth/auth-guard-jwt';
+import { AuthGuardJwt } from '../auth/auth-guard-jwt.guard';
 
 @Controller({
   path: '/events',
