@@ -1,8 +1,10 @@
 import {
   ClassSerializerInterceptor,
   Controller,
+  DefaultValuePipe,
   Get,
   Param,
+  ParseIntPipe,
   Query,
   SerializeOptions,
   UseInterceptors,
@@ -17,13 +19,13 @@ export class EventsOrganizedByUserController {
   @Get()
   @UseInterceptors(ClassSerializerInterceptor)
   async findAll(
-    @Param('userId') userId: number,
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
   ) {
-    return await this.eventsService.getEventsAttendedByUserIdPaginated(
-      userId,
-      { currentPage: page, limit },
-    );
+    return await this.eventsService.getEventsAttendedByUserIdPaginated(userId, {
+      currentPage: page,
+      limit,
+    });
   }
 }

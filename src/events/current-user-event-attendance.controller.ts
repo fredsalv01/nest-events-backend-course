@@ -28,9 +28,12 @@ export class CurrentUserEventAttendanceController {
   ) {}
 
   @Get()
-  @UseGuards(AuthJwtGuard)
+  @UseGuards(AuthGuardJwt)
   @UseInterceptors(ClassSerializerInterceptor)
-  async findAll(@CurrentUser() user: User, @Query('page') page = 1) {
+  async findAll(
+    @CurrentUser() user: User,
+    @Query('page', ParseIntPipe) page = 1,
+  ) {
     return await this.eventsService.getEventsAttendedByUserIdPaginated(
       user.id,
       { limit: 6, currentPage: page },
@@ -38,7 +41,7 @@ export class CurrentUserEventAttendanceController {
   }
 
   @Get(':/eventId')
-  @UseGuards(AuthJwtGuard)
+  @UseGuards(AuthGuardJwt)
   @UseInterceptors(ClassSerializerInterceptor)
   async findOne(
     @Param('eventId', ParseIntPipe) eventId: number,
@@ -56,7 +59,7 @@ export class CurrentUserEventAttendanceController {
     return attendee;
   }
 
-  @Put('/:eventId')
+  @Put(':eventId')
   @UseGuards(AuthGuardJwt)
   @UseInterceptors(ClassSerializerInterceptor)
   async createOrUpdate(
@@ -66,8 +69,4 @@ export class CurrentUserEventAttendanceController {
   ) {
     return this.attendeesService.createOrUpdate(input, eventId, user.id);
   }
-}
-
-function AuthJwtGuard(AuthJwtGuard: any) {
-  throw new Error('Function not implemented.');
 }
