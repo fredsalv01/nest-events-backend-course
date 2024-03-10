@@ -1,10 +1,12 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { DataSource } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
+import { User } from './../src/auth/user.entity';
+import { AuthService } from '../src/auth/auth.service';
 
 let app: INestApplication;
 let mod: TestingModule;
@@ -23,18 +25,28 @@ const loadFixtures = async (sqlFileName: string) => {
   }
 };
 
+export const tokenForUser = (
+  user: Partial<User> = {
+    id: 1,
+    username: 'e2e-test',
+  },
+): string => {
+  return app.get(AuthService).getTokenForUser(user as User);
+};
+
 describe('events (e2e)', () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     mod = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = mod.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
     await app.init();
     connection = app.get(DataSource);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await app.close();
   });
 
@@ -58,6 +70,52 @@ describe('events (e2e)', () => {
         console.log(response.body);
         expect(response.body.id).toBe(1);
         expect(response.body.name).toBe('Interesting Party');
+      });
+  });
+
+  it('should return a list of (2) event', async () => {
+    await loadFixtures('2-events-1-user.sql');
+
+    return request(app.getHttpServer())
+      .get('/events')
+      .expect(200)
+      .then((response) => {
+        console.log(response.body);
+        expect(response.body.first).toBe(1);
+        expect(response.body.last).toBe(2);
+        expect(response.body.limit).toBe(10);
+        expect(response.body.total).toBe(2);
+        expect(response.body.totalPages).toBe(1);
+        expect(response.body.currentPage).toBe(1);
+        expect(response.body.data.length).toBe(2);
+      });
+  });
+
+  it('should throw an error when creating events being unauthenticated', () => {
+    return request(app.getHttpServer()).post('/events').send({}).expect(401);
+  });
+
+  it('should throw an error when creating event with wrong input', async () => {
+    await loadFixtures('1-user.sql');
+
+    return request(app.getHttpServer())
+      .post('/events')
+      .set('Authorization', `Bearer ${tokenForUser()}`)
+      .send({})
+      .expect(400)
+      .then((response) => {
+        console.log(response);
+        expect(response.body).toMatchObject({
+          statusCode: 400,
+          message: [
+            'The name length is wrong',
+            'name must be a string',
+            'description must be longer than or equal to 5 characters',
+            'when must be a valid ISO 8601 date string',
+            'address must be longer than or equal to 5 characters',
+          ],
+          error: 'Bad Request',
+        });
       });
   });
 });

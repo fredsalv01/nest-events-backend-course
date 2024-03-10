@@ -43,7 +43,7 @@ export async function paginate<T>(
       limit: options.limit,
       total: options.total ? await qb.getCount() : null,
       totalPages: options.total
-        ? Math.round((await qb.getCount()) / options.limit)
+        ? Math.ceil((await qb.getCount()) / options.limit)
         : null,
       currentPage: options.currentPage,
       data,
