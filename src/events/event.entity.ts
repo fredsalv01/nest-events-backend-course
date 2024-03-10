@@ -9,7 +9,8 @@ import {
 import { Attendee } from './attendee.entity';
 import { User } from '../auth/user.entity';
 import { Expose } from 'class-transformer';
-import { PaginationResult } from 'src/pagination/paginator';
+import { PaginationResult } from './../pagination/paginator';
+import { PartialType } from "@nestjs/mapped-types";
 
 @Entity()
 export class Event {
