@@ -50,5 +50,14 @@ describe('events (e2e)', () => {
 
   it('should return a single event', async () => {
     await loadFixtures('1-event-1-user.sql');
+
+    return request(app.getHttpServer())
+      .get('/events/1')
+      .expect(200)
+      .then((response) => {
+        console.log(response.body);
+        expect(response.body.id).toBe(1);
+        expect(response.body.name).toBe('Interesting Party');
+      });
   });
 });
