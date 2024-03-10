@@ -55,7 +55,6 @@ describe('events (e2e)', () => {
       .get('/events')
       .expect(200)
       .then((response) => {
-        console.log(response.body);
         expect(response.body.data.length).toBe(0);
       });
   });
@@ -67,7 +66,6 @@ describe('events (e2e)', () => {
       .get('/events/1')
       .expect(200)
       .then((response) => {
-        console.log(response.body);
         expect(response.body.id).toBe(1);
         expect(response.body.name).toBe('Interesting Party');
       });
@@ -80,7 +78,6 @@ describe('events (e2e)', () => {
       .get('/events')
       .expect(200)
       .then((response) => {
-        console.log(response.body);
         expect(response.body.first).toBe(1);
         expect(response.body.last).toBe(2);
         expect(response.body.limit).toBe(10);
@@ -104,7 +101,6 @@ describe('events (e2e)', () => {
       .send({})
       .expect(400)
       .then((response) => {
-        console.log(response);
         expect(response.body).toMatchObject({
           statusCode: 400,
           message: [
@@ -117,5 +113,87 @@ describe('events (e2e)', () => {
           error: 'Bad Request',
         });
       });
+  });
+
+  it('should create an event', async () => {
+    await loadFixtures('1-user.sql');
+    const when = new Date().toISOString();
+    return request(app.getHttpServer())
+      .post('/events')
+      .set('Authorization', `Bearer ${tokenForUser()}`)
+      .send({
+        name: 'E2e Event',
+        description: 'A fake event from e2e tests',
+        when,
+        address: 'Street 123',
+      })
+      .expect(201)
+      .then((response1) => {
+        return request(app.getHttpServer())
+          .get('/events/1')
+          .expect(200)
+          .then((response2) => {
+            expect(response2.body).toMatchObject({
+              id: 1,
+              name: 'E2e Event',
+              description: 'A fake event from e2e tests',
+              address: 'Street 123',
+            });
+          });
+      });
+  });
+
+  it('should throw an error when changing non existing event', () => {
+    return request(app.getHttpServer())
+      .put('/events/100')
+      .set('Authorization', `Bearer ${tokenForUser()}`)
+      .send({})
+      .expect(404);
+  });
+
+  it('should throw an error when changing an event of other user', async () => {
+    await loadFixtures('1-event-2-users.sql');
+    return request(app.getHttpServer())
+      .patch('/events/1')
+      .set(
+        'Authorization',
+        `Bearer ${tokenForUser({ id: 2, username: 'nasty' })}`,
+      )
+      .send({ name: 'Updated event name' })
+      .expect(403);
+  });
+
+  it('should update an event name', async () => {
+    await loadFixtures('1-event-1-user.sql');
+
+    return request(app.getHttpServer())
+      .patch('/events/1')
+      .set('Authorization', `Bearer ${tokenForUser()}`)
+      .send({
+        name: 'Updated event name',
+      })
+      .expect(200)
+      .then((response) => {
+        expect(response.body.name).toBe('Updated event name');
+      });
+  });
+
+  it('should remove an event', async () => {
+    await loadFixtures('1-event-1-user.sql');
+    return request(app.getHttpServer())
+      .delete('/events/1')
+      .set('Authorization', `Bearer ${tokenForUser()}`)
+      .expect(204)
+      .then((response) => {
+        return request(app.getHttpServer()).get('/events/1').expect(404);
+      });
+  });
+
+  it('should throw an error when removing non existing event', async () => {
+    await loadFixtures('1-user.sql');
+    return request(app.getHttpServer())
+      .delete('/events/100')
+      .set('Authorization', `Bearer ${tokenForUser()}`)
+      .expect(404);
   });
 });

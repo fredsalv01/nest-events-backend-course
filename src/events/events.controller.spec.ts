@@ -36,7 +36,6 @@ describe('EventsController', () => {
       .mockImplementation((): any => result);
 
     const output = await eventsController.findAll(new ListEvents());
-    console.log('output', output);
 
     expect(output).toEqual(result);
     expect(spy).toHaveBeenCalledTimes(1);
