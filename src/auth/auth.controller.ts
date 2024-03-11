@@ -22,12 +22,12 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(AuthGuardLocal)
-  @HttpCode(200)
-  @UseInterceptors(ClassSerializerInterceptor)
+  @HttpCode(201)
   async login(@CurrentUser() user: User) {
+    const token = this.authService.getTokenForUser(user);
     return {
       userId: user.id,
-      token: this.authService.getTokenForUser(user),
+      token,
     };
   }
 
