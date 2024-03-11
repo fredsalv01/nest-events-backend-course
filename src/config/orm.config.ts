@@ -4,6 +4,8 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Attendee } from '../events/attendee.entity';
 import { User } from '../auth/user.entity';
 import { Profile } from '../auth/profile.entity';
+import { Teacher } from '../school/teacher.entity';
+import { Subject } from '../school/subject.entity';
 
 export default registerAs(
   'orm.config',
@@ -14,7 +16,7 @@ export default registerAs(
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
-    entities: [Event, Attendee, User, Profile],
+    entities: [Event, Attendee, User, Profile, Teacher, Subject],
     synchronize: true,
     dropSchema: Boolean(parseInt(process.env.DB_DROP_SCHEMA)),
   }),
