@@ -25,7 +25,6 @@ export class TeacherResolver {
       where: {
         id: id,
       },
-      relations: ['subjects'],
     });
   }
 
@@ -34,6 +33,8 @@ export class TeacherResolver {
     @Args('input', { type: () => TeacherAddDto })
     input: TeacherAddDto,
   ): Promise<Teacher> {
-    return await this.teachersRepository.save(input);
+    return await this.teachersRepository.save(
+      new Teacher(input)
+    );
   }
 }
