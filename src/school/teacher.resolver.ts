@@ -1,11 +1,22 @@
-import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Args,
+  Int,
+  Mutation,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { Teacher } from './teacher.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TeacherAddDto } from './input/teacher-add.dto';
+import { Logger } from '@nestjs/common';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
+  private readonly logger = new Logger(TeacherResolver.name);
+
   constructor(
     @InjectRepository(Teacher)
     private readonly teachersRepository: Repository<Teacher>,
@@ -33,8 +44,12 @@ export class TeacherResolver {
     @Args('input', { type: () => TeacherAddDto })
     input: TeacherAddDto,
   ): Promise<Teacher> {
-    return await this.teachersRepository.save(
-      new Teacher(input)
-    );
+    return await this.teachersRepository.save(new Teacher(input));
+  }
+
+  @ResolveField('subjects')
+  public async subjects(@Parent() teacher: Teacher) {
+    this.logger.debug(`@ResolveField subjects was called`);
+    return await teacher.subjects;
   }
 }
