@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TeacherAddDto } from './input/teacher-add.dto';
 import { Logger } from '@nestjs/common';
+import { TeacherEditDto } from './input/teacher-edit.dto';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
@@ -45,6 +46,23 @@ export class TeacherResolver {
     input: TeacherAddDto,
   ): Promise<Teacher> {
     return await this.teachersRepository.save(new Teacher(input));
+  }
+
+  @Mutation(() => Teacher, { name: 'teacherEdit' })
+  public async edit(
+    @Args('id', { type: () => Int, description: 'teacher id' })
+    id: number,
+    @Args('input', { type: () => TeacherEditDto })
+    input: TeacherEditDto,
+  ): Promise<Teacher> {
+    const teacher = await this.teachersRepository.findOneOrFail({
+      where: {
+        id: id,
+      },
+    });
+    return await this.teachersRepository.save(
+      new Teacher(Object.assign(teacher, input)),
+    );
   }
 
   @ResolveField('subjects')
