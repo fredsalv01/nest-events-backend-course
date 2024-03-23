@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { Profile } from './profile.entity';
 import { AuthResolver } from './auth.resolver';
+import { UserResolver } from './user.resolver';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile]),
@@ -20,7 +21,13 @@ import { AuthResolver } from './auth.resolver';
       }),
     }),
   ],
-  providers: [LocalStrategy, JwtStrategy, AuthService, AuthResolver],
+  providers: [
+    LocalStrategy,
+    JwtStrategy,
+    AuthService,
+    AuthResolver,
+    UserResolver,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}
