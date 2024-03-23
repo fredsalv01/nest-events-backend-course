@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { Profile } from './profile.entity';
+import { AuthResolver } from './auth.resolver';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile]),
@@ -19,7 +20,7 @@ import { Profile } from './profile.entity';
       }),
     }),
   ],
-  providers: [LocalStrategy, JwtStrategy, AuthService],
+  providers: [LocalStrategy, JwtStrategy, AuthService, AuthResolver],
   controllers: [AuthController],
 })
 export class AuthModule {}
