@@ -32,7 +32,7 @@ import { SchoolModule } from './school/school.module';
     EventsModule,
     UsersModule,
     AuthModule,
-    SchoolModule
+    SchoolModule,
   ],
   controllers: [AppController],
   providers: [
@@ -41,5 +41,6 @@ import { SchoolModule } from './school/school.module';
       useClass: AppService,
     },
   ],
+  exports: [AuthModule, UsersModule],
 })
 export class AppModule {}

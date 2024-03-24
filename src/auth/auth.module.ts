@@ -9,6 +9,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { Profile } from './profile.entity';
 import { AuthResolver } from './auth.resolver';
 import { UserResolver } from './user.resolver';
+import { UserDoesNotExistsConstrint } from './validation/user-does-not-exists.constraint';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile]),
@@ -27,6 +28,7 @@ import { UserResolver } from './user.resolver';
     AuthService,
     AuthResolver,
     UserResolver,
+    UserDoesNotExistsConstrint,
   ],
   controllers: [AuthController],
 })
