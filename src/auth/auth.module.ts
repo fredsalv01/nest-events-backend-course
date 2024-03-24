@@ -10,6 +10,8 @@ import { Profile } from './profile.entity';
 import { AuthResolver } from './auth.resolver';
 import { UserResolver } from './user.resolver';
 import { UserDoesNotExistsConstrint } from './validation/user-does-not-exists.constraint';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile]),
@@ -28,8 +30,9 @@ import { UserDoesNotExistsConstrint } from './validation/user-does-not-exists.co
     AuthService,
     AuthResolver,
     UserResolver,
+    UsersService,
     UserDoesNotExistsConstrint,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, UsersController],
 })
 export class AuthModule {}

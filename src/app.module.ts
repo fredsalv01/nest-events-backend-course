@@ -7,7 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import ormConfig from './config/orm.config';
 import ormConfigProd from './config/orm.config.prod';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './auth/users.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { SchoolModule } from './school/school.module';
@@ -30,7 +29,6 @@ import { SchoolModule } from './school/school.module';
       playground: true,
     }),
     EventsModule,
-    UsersModule,
     AuthModule,
     SchoolModule,
   ],
@@ -41,6 +39,6 @@ import { SchoolModule } from './school/school.module';
       useClass: AppService,
     },
   ],
-  exports: [AuthModule, UsersModule],
+  exports: [AuthModule],
 })
 export class AppModule {}
