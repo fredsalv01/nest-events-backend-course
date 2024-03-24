@@ -14,7 +14,7 @@ import { TeacherAddDto } from './input/teacher-add.dto';
 import { Logger, UseGuards } from '@nestjs/common';
 import { TeacherEditDto } from './input/teacher-edit.dto';
 import { EntityWithId } from './school.types';
-import { AuthGuardJwtGql } from 'src/auth/auth-guard-jwt.gql';
+import { AuthGuardJwtGql } from '../auth/auth-guard-jwt.gql';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
@@ -87,6 +87,4 @@ export class TeacherResolver {
     this.logger.debug(`@ResolveField subjects was called`);
     return await teacher.subjects;
   }
-
-  
 }

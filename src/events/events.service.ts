@@ -97,7 +97,7 @@ export class EventsService {
     filter: ListEvents,
     paginateOptions: PaginateOptions,
   ): Promise<PaginatedEvents> {
-    return await paginate(
+    return await paginate<Event>(
       await this.getEventsWithAttendeeCountFilteredQuery(filter),
       paginateOptions,
     );
